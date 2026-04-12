@@ -4,6 +4,8 @@ import { registerUser } from "./auth.service";
 
 export async function register(req: Request, res: Response) {
   try {
+    console.log("BODY:", req.body); // 👈 ADD THIS HERE
+
     const parsedData = registerSchema.parse(req.body);
     const result = await registerUser(parsedData);
 
