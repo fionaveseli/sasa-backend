@@ -12,7 +12,7 @@ function buildAuthResponse(user: {
   role: "admin" | "university_manager" | "student";
   graduationYear: number;
   timeZone: string;
-  universityId: number | null;
+  universityId: string | null;
   createdAt: Date;
   updatedAt: Date;
 }) {

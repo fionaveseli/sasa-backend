@@ -7,7 +7,7 @@ export const registerSchema = z.object({
   role: z.enum(["admin", "university_manager", "student"]).optional(),
   graduationYear: z.number().int(),
   timeZone: z.string().min(1, "Time zone is required"),
-  universityId: z.number().int().optional(),
+  universityId: z.string().optional(),
 });
 
 export const loginSchema = z.object({
