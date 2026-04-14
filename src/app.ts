@@ -5,6 +5,7 @@ import authRouter from "./modules/auth/auth.routes";
 import usersRouter from "./modules/users/users.routes";
 import universitiesRouter from "./modules/universities/universities.routes";
 import uploadRouter from "./modules/upload/upload.routes";
+import teamsRouter from "./modules/teams/teams.routes";
 
 const app = express();
 
@@ -23,6 +24,7 @@ app.get("/health", (_req, res) => {
 app.use("/api/auth", authRouter);
 app.use("/api/users", usersRouter);
 app.use("/api/universities", universitiesRouter);
-app.use("/upload", uploadRouter);
+app.use("/api/upload", uploadRouter);
+app.use("/api", teamsRouter);
 
 export default app;

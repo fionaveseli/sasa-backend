@@ -22,6 +22,7 @@ model User {
   timeZone       String
   universityId   String?
   university     University? @relation(fields: [universityId], references: [id])
+  teamMemberships TeamMember[]
   createdAt      DateTime    @default(now())
   updatedAt      DateTime    @updatedAt
 }
@@ -30,6 +31,31 @@ model University {
   id        String   @id @default(uuid())
   name      String   @unique
   users     User[]
+  teams     Team[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model Team {
+  id           Int          @id @default(autoincrement())
+  name         String
+  bio          String?
+  logo         String?
+  universityId String
+  createdBy    Int
+  university   University   @relation(fields: [universityId], references: [id])
+  members      TeamMember[]
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+}
+
+model TeamMember {
+  id        Int      @id @default(autoincrement())
+  teamId     Int
+  userId     Int
+  team       Team    @relation(fields: [teamId], references: [id])
+  user       User    @relation(fields: [userId], references: [id])
+  createdAt  DateTime @default(now())
+
+  @@unique([teamId, userId])
 }

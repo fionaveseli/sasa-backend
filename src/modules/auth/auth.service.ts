@@ -36,7 +36,7 @@ function buildAuthResponse(user: {
       role: user.role,
       graduationYear: user.graduationYear,
       timeZone: user.timeZone,
-      university_id: user.universityId,
+      universityId: user.universityId,
       createdAt: user.createdAt,
       updatedAt: user.updatedAt,
     },

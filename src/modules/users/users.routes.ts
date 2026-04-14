@@ -4,11 +4,49 @@ import { prisma } from "../../lib/prisma";
 
 const usersRouter = Router();
 
-usersRouter.get("/me", protect, (req: Request, res: Response) => {
-  return res.status(200).json({
-    message: "Protected route works",
-    user: req.user,
-  });
+usersRouter.get("/me", protect, async (req: Request, res: Response) => {
+  try {
+    if (!req.user?.userId) {
+      return res.status(401).json({
+        success: false,
+        message: "Unauthorized",
+      });
+    }
+
+    const user = await prisma.user.findUnique({
+      where: {
+        id: req.user.userId,
+      },
+      select: {
+        id: true,
+        fullName: true,
+        email: true,
+        role: true,
+        graduationYear: true,
+        timeZone: true,
+        universityId: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      user,
+    });
+  } catch {
+    return res.status(500).json({
+      success: false,
+      message: "Failed to fetch current user",
+    });
+  }
 });
 
 usersRouter.patch("/me", protect, async (req: Request, res: Response) => {
@@ -51,10 +89,12 @@ usersRouter.patch("/me", protect, async (req: Request, res: Response) => {
       },
     });
 
+    const { password, ...safeUser } = updatedUser;
+
     return res.status(200).json({
       success: true,
       message: "University joined successfully",
-      user: updatedUser,
+      user: safeUser,
     });
   } catch (error) {
     return res.status(500).json({
