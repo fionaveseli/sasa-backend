@@ -5,6 +5,7 @@ import {
   registerTeamInTournament,
   updateTournamentStatus,
   getTournamentMatches,
+  getUniversityTournaments,
 } from "./tournaments.service";
 
 export const getTournamentsController = async (
@@ -22,6 +23,27 @@ export const getTournamentsController = async (
     return res.status(500).json({
       success: false,
       message: "Failed to fetch tournaments",
+    });
+  }
+};
+
+export const getUniversityTournamentsController = async (
+  req: Request,
+  res: Response
+) => {
+  try {
+    const universityId = req.params.id as string;
+
+    const tournaments = await getUniversityTournaments(universityId);
+
+    return res.status(200).json({
+      success: true,
+      tournaments,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Failed to fetch university tournaments",
     });
   }
 };

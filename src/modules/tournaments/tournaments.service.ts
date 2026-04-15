@@ -24,6 +24,33 @@ export const getAllTournaments = async () => {
   });
 };
 
+export const getUniversityTournaments = async (universityId: string) => {
+  return prisma.tournament.findMany({
+    where: {
+      universityId,
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+    select: {
+      id: true,
+      name: true,
+      type: true,
+      registrationDeadline: true,
+      startDate: true,
+      endDate: true,
+      universityId: true,
+      bracketType: true,
+      description: true,
+      rules: true,
+      timeZone: true,
+      status: true,
+      createdAt: true,
+      updatedAt: true,
+    },
+  });
+};
+
 export const createTournament = async (data: {
   name: string;
   type: string;
