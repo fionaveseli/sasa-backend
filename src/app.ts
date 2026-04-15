@@ -6,6 +6,7 @@ import usersRouter from "./modules/users/users.routes";
 import universitiesRouter from "./modules/universities/universities.routes";
 import uploadRouter from "./modules/upload/upload.routes";
 import teamsRouter from "./modules/teams/teams.routes";
+import tournamentsRouter from "./modules/tournaments/tournaments.routes";
 
 const app = express();
 
@@ -26,5 +27,6 @@ app.use("/api/users", usersRouter);
 app.use("/api/universities", universitiesRouter);
 app.use("/api/upload", uploadRouter);
 app.use("/api", teamsRouter);
+app.use("/api", tournamentsRouter);
 
 export default app;

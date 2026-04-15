@@ -32,6 +32,7 @@ model University {
   name      String   @unique
   users     User[]
   teams     Team[]
+  tournaments Tournament[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -45,6 +46,7 @@ model Team {
   createdBy    Int
   university   University   @relation(fields: [universityId], references: [id])
   members      TeamMember[]
+  tournamentEntries TournamentTeam[] @relation
   createdAt    DateTime     @default(now())
   updatedAt    DateTime     @updatedAt
 }
@@ -58,4 +60,51 @@ model TeamMember {
   createdAt  DateTime @default(now())
 
   @@unique([teamId, userId])
+}
+
+model Tournament {
+  id                   Int              @id @default(autoincrement())
+  name                 String
+  type                 String
+  registrationDeadline DateTime
+  startDate            DateTime
+  endDate              DateTime
+  universityId         String
+  bracketType          String
+  description          String
+  rules                String
+  timeZone             String
+  status               String           @default("draft")
+  university           University       @relation(fields: [universityId], references: [id])
+  registrations        TournamentTeam[]
+  matches              Match[]
+  createdAt            DateTime         @default(now())
+  updatedAt            DateTime         @updatedAt
+}
+
+model TournamentTeam {
+  id           Int        @id @default(autoincrement())
+  tournamentId Int
+  teamId       Int
+  tournament   Tournament @relation(fields: [tournamentId], references: [id])
+  team         Team       @relation(fields: [teamId], references: [id])
+  createdAt    DateTime   @default(now())
+
+  @@unique([tournamentId, teamId])
+}
+
+model Match {
+  id            Int        @id @default(autoincrement())
+  tournamentId  Int
+  team1Id       Int
+  team2Id       Int
+  scheduledTime DateTime
+  roundNumber   Int
+  matchNumber   Int
+  status        String     @default("scheduled")
+  winnerId      Int?
+  nextMatchId   Int?
+  tournament    Tournament @relation(fields: [tournamentId], references: [id])
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
 }
