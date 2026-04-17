@@ -57,7 +57,6 @@ export const createTournament = async (data: {
   registration_deadline: string;
   start_date: string;
   end_date: string;
-  universityId: string;
   bracket_type: string;
   description: string;
   rules: string;
@@ -65,21 +64,13 @@ export const createTournament = async (data: {
   userId: number;
 }) => {
   const user = await prisma.user.findUnique({
-    where: {
-      id: data.userId,
-    },
+    where: { id: data.userId },
+    select: { id: true, universityId: true, role: true },
   });
 
-  if (!user) {
-    throw new Error("User not found");
-  }
-
+  if (!user) throw new Error("User not found");
   if (!user.universityId) {
     throw new Error("User is not associated with a university");
-  }
-
-  if (user.universityId !== data.universityId) {
-    throw new Error("User does not belong to this university");
   }
 
   const tournament = await prisma.tournament.create({
@@ -89,7 +80,7 @@ export const createTournament = async (data: {
       registrationDeadline: new Date(data.registration_deadline),
       startDate: new Date(data.start_date),
       endDate: new Date(data.end_date),
-      universityId: data.universityId,
+      universityId: user.universityId,
       bracketType: data.bracket_type,
       description: data.description,
       rules: data.rules,
@@ -103,7 +94,7 @@ export const createTournament = async (data: {
 
 export const registerTeamInTournament = async (
   tournamentId: number,
-  teamId: number
+  teamId: number,
 ) => {
   const tournament = await prisma.tournament.findUnique({
     where: {
@@ -156,7 +147,7 @@ export const registerTeamInTournament = async (
 
 export const updateTournamentStatus = async (
   tournamentId: number,
-  status: string
+  status: string,
 ) => {
   const tournament = await prisma.tournament.findUnique({
     where: {

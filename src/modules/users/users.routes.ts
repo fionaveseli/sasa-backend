@@ -7,16 +7,11 @@ const usersRouter = Router();
 usersRouter.get("/me", protect, async (req: Request, res: Response) => {
   try {
     if (!req.user?.userId) {
-      return res.status(401).json({
-        success: false,
-        message: "Unauthorized",
-      });
+      return res.status(401).json({ message: "Unauthorized" });
     }
 
     const user = await prisma.user.findUnique({
-      where: {
-        id: req.user.userId,
-      },
+      where: { id: req.user.userId },
       select: {
         id: true,
         fullName: true,
@@ -31,21 +26,13 @@ usersRouter.get("/me", protect, async (req: Request, res: Response) => {
     });
 
     if (!user) {
-      return res.status(404).json({
-        success: false,
-        message: "User not found",
-      });
+      return res.status(404).json({ message: "User not found" });
     }
 
-    return res.status(200).json({
-      success: true,
-      user,
-    });
-  } catch {
-    return res.status(500).json({
-      success: false,
-      message: "Failed to fetch current user",
-    });
+    return res.status(200).json({ user });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Failed to fetch current user" });
   }
 });
 
@@ -54,53 +41,32 @@ usersRouter.patch("/me", protect, async (req: Request, res: Response) => {
     const { universityId } = req.body;
 
     if (!req.user?.userId) {
-      return res.status(401).json({
-        success: false,
-        message: "Unauthorized",
-      });
+      return res.status(401).json({ message: "Unauthorized" });
     }
 
     if (!universityId || typeof universityId !== "string") {
-      return res.status(400).json({
-        success: false,
-        message: "University ID is required",
-      });
+      return res.status(400).json({ message: "University ID is required" });
     }
 
     const university = await prisma.university.findUnique({
-      where: {
-        id: universityId,
-      },
+      where: { id: universityId },
     });
 
     if (!university) {
-      return res.status(404).json({
-        success: false,
-        message: "University not found",
-      });
+      return res.status(404).json({ message: "University not found" });
     }
 
     const updatedUser = await prisma.user.update({
-      where: {
-        id: req.user.userId,
-      },
-      data: {
-        universityId,
-      },
+      where: { id: req.user.userId },
+      data: { universityId },
     });
 
     const { password, ...safeUser } = updatedUser;
 
-    return res.status(200).json({
-      success: true,
-      message: "University joined successfully",
-      user: safeUser,
-    });
+    return res.status(200).json({ user: safeUser });
   } catch (error) {
-    return res.status(500).json({
-      success: false,
-      message: "Failed to join university",
-    });
+    console.error(error);
+    return res.status(500).json({ message: "Failed to join university" });
   }
 });
 

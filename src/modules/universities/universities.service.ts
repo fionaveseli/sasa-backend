@@ -1,23 +1,29 @@
 import { prisma } from "../../lib/prisma";
 
+type CreateUniversityInput = {
+  universityName: string;
+  universityAddress: string;
+  contactNumber: string;
+  logo?: string;
+  bannerColor: string;
+  bio: string;
+};
+
 export const getAllUniversities = async () => {
-  const universities = await prisma.university.findMany({
+  return prisma.university.findMany({
     orderBy: {
       createdAt: "desc",
     },
-    select: {
-      id: true,
-      name: true,
-    },
   });
-
-  return universities;
 };
 
-export const createUniversity = async (name: string, userId: number) => {
+export const createUniversity = async (
+  data: CreateUniversityInput,
+  userId: number
+) => {
   const existingUniversity = await prisma.university.findUnique({
     where: {
-      name,
+      name: data.universityName,
     },
   });
 
@@ -39,13 +45,28 @@ export const createUniversity = async (name: string, userId: number) => {
     throw new Error("User already belongs to a university");
   }
 
-  const university = await prisma.university.create({
-    data: {
-      name,
-    },
-  });
+  const [university, updatedUser] = await prisma.$transaction([
+    prisma.university.create({
+      data: {
+        name: data.universityName,
+        location: data.universityAddress,
+        contact_info: data.contactNumber,
+        logo: data.logo ?? null,
+        banner_color: data.bannerColor,
+        bio: data.bio,
+      },
+    }),
+    prisma.user.update({
+      where: {
+        id: userId,
+      },
+      data: {
+        universityId: undefined, 
+      },
+    }),
+  ]);
 
-  const updatedUser = await prisma.user.update({
+  const finalUser = await prisma.user.update({
     where: {
       id: userId,
     },
@@ -57,6 +78,6 @@ export const createUniversity = async (name: string, userId: number) => {
 
   return {
     university,
-    updatedUser,
+    updatedUser: finalUser,
   };
 };

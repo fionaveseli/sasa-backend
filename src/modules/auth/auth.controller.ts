@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+import { ZodError } from "zod";
 import { loginSchema, registerSchema } from "./auth.validation";
 import { loginUser, registerUser } from "./auth.service";
 
@@ -9,9 +10,11 @@ export async function register(req: Request, res: Response) {
 
     return res.status(201).json(result);
   } catch (error) {
-    if (error instanceof Error) {
+    console.error(error);
+
+    if (error instanceof ZodError) {
       return res.status(400).json({
-        message: error.message,
+        message: error.errors[0]?.message || "Validation error",
       });
     }
 
@@ -28,9 +31,11 @@ export async function login(req: Request, res: Response) {
 
     return res.status(200).json(result);
   } catch (error) {
-    if (error instanceof Error) {
+    console.error(error);
+
+    if (error instanceof ZodError) {
       return res.status(400).json({
-        message: error.message,
+        message: error.errors[0]?.message || "Validation error",
       });
     }
 

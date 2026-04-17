@@ -3,7 +3,11 @@ import jwt from "jsonwebtoken";
 import { prisma } from "../../lib/prisma";
 import { LoginInput, RegisterInput } from "./auth.validation";
 
-const JWT_SECRET = process.env.JWT_SECRET || "super-secret-change-me";
+if (!process.env.JWT_SECRET) {
+  throw new Error("JWT_SECRET is not defined");
+}
+
+const JWT_SECRET = process.env.JWT_SECRET;
 
 function buildAuthResponse(user: {
   id: number;
@@ -23,32 +27,18 @@ function buildAuthResponse(user: {
       role: user.role,
     },
     JWT_SECRET,
-    {
-      expiresIn: "24h",
-    }
+    { expiresIn: "24h" }
   );
 
   return {
-    user: {
-      id: user.id,
-      fullName: user.fullName,
-      email: user.email,
-      role: user.role,
-      graduationYear: user.graduationYear,
-      timeZone: user.timeZone,
-      universityId: user.universityId,
-      createdAt: user.createdAt,
-      updatedAt: user.updatedAt,
-    },
+    user,
     token,
   };
 }
 
 export async function registerUser(data: RegisterInput) {
   const existingUser = await prisma.user.findUnique({
-    where: {
-      email: data.email,
-    },
+    where: { email: data.email },
   });
 
   if (existingUser) {
@@ -62,21 +52,21 @@ export async function registerUser(data: RegisterInput) {
       fullName: data.fullName,
       email: data.email,
       password: hashedPassword,
-      role: data.role ?? "student",
+      role: "student", // 🔥 force role
       graduationYear: data.graduationYear,
       timeZone: data.timeZone,
       universityId: data.universityId,
     },
   });
 
-  return buildAuthResponse(user);
+  const { password, ...safeUser } = user;
+
+  return buildAuthResponse(safeUser);
 }
 
 export async function loginUser(data: LoginInput) {
   const user = await prisma.user.findUnique({
-    where: {
-      email: data.email,
-    },
+    where: { email: data.email },
   });
 
   if (!user) {
@@ -89,5 +79,7 @@ export async function loginUser(data: LoginInput) {
     throw new Error("Invalid email or password");
   }
 
-  return buildAuthResponse(user);
+  const { password, ...safeUser } = user;
+
+  return buildAuthResponse(safeUser);
 }
