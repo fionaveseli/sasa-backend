@@ -14,7 +14,7 @@ export async function register(req: Request, res: Response) {
 
     if (error instanceof ZodError) {
       return res.status(400).json({
-        message: error.errors[0]?.message || "Validation error",
+        message: error.issues[0]?.message || "Validation error",
       });
     }
 
@@ -35,7 +35,7 @@ export async function login(req: Request, res: Response) {
 
     if (error instanceof ZodError) {
       return res.status(400).json({
-        message: error.errors[0]?.message || "Validation error",
+        message: error.issues[0]?.message || "Validation error",
       });
     }
 
