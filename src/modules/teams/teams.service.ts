@@ -23,14 +23,14 @@ export const getUniversityTeams = async (universityId: string) => {
     },
   });
 
-  return teams.map((team) => ({
+  return teams.map((team: any) => ({
     id: team.id,
     name: team.name,
     bio: team.bio,
     logo: team.logo,
     university_id: team.universityId,
     created_by: team.createdBy,
-    players: team.members.map((member) => member.user),
+    players: team.members.map((member: any) => member.user),
   }));
 };
 
