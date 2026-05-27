@@ -5,6 +5,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
+  output   = "../src/generated/prisma"
 }
 
 model User {
